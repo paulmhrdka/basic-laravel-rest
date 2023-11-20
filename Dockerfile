@@ -1,5 +1,5 @@
-# Use the official PHP image
-FROM php:8.0-cli
+# Stage 1: Build dependencies
+FROM php:8.0-cli AS builder
 
 # Set working directory
 WORKDIR /var/www/html
@@ -18,6 +18,16 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY composer.json composer.lock /var/www/html/
 RUN composer install --no-scripts --no-autoloader
 
+# Stage 2: Build the final image
+FROM php:8.0-cli
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy only necessary files from the builder stage
+COPY --from=builder /var/www/html/vendor /var/www/html/vendor
+COPY --from=builder /usr/local/bin/composer /usr/local/bin/composer
+
 # Copy the rest of the application files
 COPY . /var/www/html/
 
@@ -30,5 +40,5 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Expose port
 EXPOSE 8000
 
-# Start laravel application
+# Start Laravel application
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
