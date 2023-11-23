@@ -19,16 +19,13 @@ jobs:
         run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
 
       - name: Docker build
-        run: docker build -t localhost:5000/your-image-name:${{ steps.set_tag.outputs.tag }} .
+        run: docker build -t localhost:5000/laravel-product-service:${{ steps.set_tag.outputs.tag }} .
       
       - name: Docker tag
-        run: docker tag localhost:5000/your-image-name:${{ steps.set_tag.outputs.tag }} localhost:5000/your-image-name:latest
-
-      - name: Login to Local Docker Registry
-        run: docker login localhost:5000
-
+        run: docker tag localhost:5000/laravel-product-service:${{ steps.set_tag.outputs.tag }} localhost:5000/laravel-product-service:latest
+        
       - name: Push Docker Image to Local Registry
-        run: docker push localhost:5000/your-image-name:${{ steps.set_tag.outputs.tag }} && docker push localhost:5000/your-image-name:latest
+        run: docker push localhost:5000/laravel-product-service:${{ steps.set_tag.outputs.tag }} && docker push localhost:5000/laravel-product-service:latest
 
       - name: Deploy to Local Docker Compose
-        run: docker-compose -f /path/to/your/docker-compose.yml up -d
+        run: docker-compose -f ${{ secrets.PATH_DOCKER_COMPOSE }}/docker-compose.yml up -d --build
