@@ -21,6 +21,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ProductController::class, 'index']);
 Route::get('/{id}', [ProductController::class, 'show']);
 Route::get('/search/{name}', [ProductController::class, 'search']);
+Route::get('/testing', function () {
+    return response("hello", 200);
+});
 
 
 // Protected routes
